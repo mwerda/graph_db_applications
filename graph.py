@@ -11,6 +11,8 @@ class Graph:
 	#<editor-fold desc="constant strings">
 	_db_address = "bolt://localhost"							#bolt is a type of db driver
 
+	_query_del_nodes_and_relations = "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r"
+
 	_path_all_items = 'u.item'									#paths to specific files
 	_path_all_users = 'u.user'
 	_path_all_relations = 'u.data'
