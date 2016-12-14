@@ -1,0 +1,12 @@
+version: '2'
+services:
+  neo4j-user-connections:
+    image: neo4j:3.0.4
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    volumes:
+      - ./neo4j_data:/data
+    environment:
+      NEO4J_AUTH: none
+      NEO4J_dbms_memory_heap_maxSize: 4096
