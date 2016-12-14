@@ -1,0 +1,13 @@
+0. Sklonuj repo
+1. W linii komend przejdź do folderu, do którego sklonowałeś repo
+2. docker-compose up -d
+3. przeglądarka: localhost:7474
+4. START n=node(*) MATCH (n)-[r]->(m) RETURN n,r,m;
+5. W lewym górnym rog okna kliknij na Movie, zmień kolor węzłów i ich wielkość na maksymalną
+6. Klikając na węzły pokaz ich cechy
+7. Odkomentuj ostatnią linię kodu, puść program i pokaż zawartość bazy danych ponownie - uwaga, to chwilę potrwa
+
+
+Problemy:
+1. Docker nie może uruchomić bazy danych - wyłącz firewalla (antywirusa)
+2. Nie zgadza się klucz użytkownika przy uruchomieniu pythonowego skryptu - wywal plik C:\Users\<nazwa>\.neo4\known_hosts
