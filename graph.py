@@ -14,7 +14,7 @@ class Graph:
 	_query_del_nodes_and_relations = "MATCH (n) OPTIONAL MATCH (n)-[r]-() DELETE n,r"
 
 	_path_all_items = 'u.item'									#paths to specific files
-	_path_all_users = 'u.user'
+	_path_all_users = 'u.user2'
 	_path_all_relations = 'u.data'
 
 	_path_test_items = 'u.itemtest'
