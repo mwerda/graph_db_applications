@@ -1,0 +1,26 @@
+{
+    "Poland": [
+        "Poznan",
+        "Warszawa",
+        "Krakow",
+        "Bydgoszcz"
+    ],
+    "USA": [
+        "NY",
+        "Chicago",
+        "Seattle",
+        "Portland"
+    ],
+    "Japan": [
+        "Tokio",
+        "Hiroshima",
+        "Osaka",
+        "Sapporo"
+    ],
+    "Russia": [
+        "Moscow",
+        "Petersburg",
+        "Omsk",
+        "Perm"
+    ]
+}
