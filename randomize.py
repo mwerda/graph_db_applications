@@ -72,6 +72,8 @@ for i in range(100):
     print city
 
     defaultProbability = 30
+    largeProbability = 50
+    smallProbability = 10
 
     userGames = []
     for game in games:
@@ -87,24 +89,28 @@ for i in range(100):
 
     userEvents = []
     for event in events:
-        if event.city == city and random.randint(0, 100) < 50:
+        if event.city == city and random.randint(0, 100) < largeProbability:
             userEvents.append(event)
-        elif event.country == country and random.randint(0, 100) < 30:
+        elif event.country == country and random.randint(0, 100) < defaultProbability:
             userEvents.append(event)
-        elif random.randint(0, 100) < 10:
+        elif random.randint(0, 100) < smallProbability:
             userEvents.append(event)
 
     users.append(User(i, name, country, city, userGames, userGroups, userEvents))
 
 
+friendLargeProbability = 40
+friendDefaultProbability = 20
+friendSmallProbability = 5
+
 for mainUser in users:
     for friendUser in users:
         if mainUser.id != friendUser.id:
-            if mainUser.city == friendUser.city and random.randint(0, 100) < 40:
+            if mainUser.city == friendUser.city and random.randint(0, 100) < friendLargeProbability:
                 mainUser.friends.append(friendUser)
-            elif mainUser.country == friendUser.country and random.randint(0, 100) < 20:
+            elif mainUser.country == friendUser.country and random.randint(0, 100) < friendDefaultProbability:
                 mainUser.friends.append(friendUser)
-            elif random.randint(0, 100) < 5:
+            elif random.randint(0, 100) < friendSmallProbability:
                 mainUser.friends.append(friendUser)
 
 print users[4].friends[0].name
