@@ -113,6 +113,9 @@ class Graph:
 		return clean_line
 	#</editor-fold>
 
+	def execute_query(self, query):
+		self._session.run(query)
+
 	#<editor-fold desc="constructor, destructor">
 	def __init__(self):
 		self._driver = GraphDatabase.driver(self._db_address, auth=basic_auth("neo4j", "neo4j"))
