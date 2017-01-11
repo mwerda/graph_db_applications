@@ -129,8 +129,8 @@ class Graph:
 ############################################
 
 
-graph = Graph()
-graph.wipe()
-
-graph.load_test_data()
+# graph = Graph()
+# graph.wipe()
+#
+# graph.load_test_data()
 #graph.load_all_data()
