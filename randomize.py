@@ -54,72 +54,6 @@ with open('names.csv', 'rU') as csvfile:
 
 names.pop(0)
 
-events_names = ['Cinema', 'Party', 'Paintball', 'Kayaking', 'Chess', 'Board games', 'LAN party', 'Carting']
-for i in range(10):
-	random.seed()
-	name = random.choice(names)
-	print name
-	country = random.choice(countries)
-	print country
-	city = random.choice(countriesCities[country])
-	print city
-	name = random.choice(events_names)
-	events.append(Event(i, name, country, city))
-
-for i in range(100):
-	random.seed()
-	name = random.choice(names)
-	print name
-	country = random.choice(countries)
-	print country
-	city = random.choice(countriesCities[country])
-	print city
-
-
-	defaultProbability = 30
-	largeProbability = 50
-	smallProbability = 10
-
-	userGames = []
-	for game in games:
-		if random.randint(0, 100) < defaultProbability:
-			userGames.append(game)
-	print userGames
-
-	userGroups = []
-	for group in groups:
-		if random.randint(0, 100) < defaultProbability:
-			userGroups.append(group)
-	print userGroups
-
-	userEvents = []
-	for event in events:
-		if event.city == city and random.randint(0, 100) < largeProbability:
-			userEvents.append(event)
-		elif event.country == country and random.randint(0, 100) < defaultProbability:
-			userEvents.append(event)
-		elif random.randint(0, 100) < smallProbability:
-			userEvents.append(event)
-
-	users.append(User(i, name, country, city, userGames, userGroups, userEvents))
-
-friendLargeProbability = 40
-friendDefaultProbability = 20
-friendSmallProbability = 5
-
-for mainUser in users:
-	for friendUser in users:
-		if mainUser.id != friendUser.id:
-			if mainUser.city == friendUser.city and random.randint(0, 100) < friendLargeProbability:
-				mainUser.friends.append(friendUser)
-			elif mainUser.country == friendUser.country and random.randint(0, 100) < friendDefaultProbability:
-				mainUser.friends.append(friendUser)
-			elif random.randint(0, 100) < friendSmallProbability:
-				mainUser.friends.append(friendUser)
-
-
-# print users[4].friends[0].name
-
 ####### creating a graph
 def add_users(users, graph):
 	for user in users:
@@ -146,14 +80,14 @@ def connect_events_with_places(events, graph):
 		query1 = "MATCH (event:Event) " \
                     "MATCH (country:Country) " \
                     "WHERE event.country = country.name " \
-                    "CREATE (event)-[:HAPPENS_IN]->(country)"
+                    "CREATE UNIQUE (event)-[:HAPPENS_IN]->(country)"
 
 		query2 = "MATCH (event:Event) " \
 				 "MATCH (city:City) " \
 				 "WHERE event.city = city.name " \
-				 "CREATE (event)-[:HAPPENS_IN]->(city)"
+				 "CREATE UNIQUE (event)-[:HAPPENS_IN]->(city)"
 
-		graph.execute_query(query1)
+		# graph.execute_query(query1)
 		graph.execute_query(query2)
 
 def add_cities(countries_cities, graph):
@@ -166,43 +100,55 @@ def add_cities(countries_cities, graph):
 def create_connections_of_users(users, graph):
 	match_country = "MATCH (user:User) " \
 					"MATCH (country:Country) " \
-					"WHERE user.city = country.name " \
-					"CREATE (user)-[:LIVES_IN]->(country)"
+					"WHERE user.country = country.name " \
+					"CREATE UNIQUE (user)-[:LIVES_IN]->(country)"
 	graph.execute_query(match_country)
 
 	match_city = "MATCH (user:User) " \
 				 "MATCH (city:City) " \
 				 "WHERE user.city = city.name " \
-				 "CREATE (user)-[:LIVES_IN]->(city)"
+				 "CREATE UNIQUE (user)-[:LIVES_IN]->(city)"
 	graph.execute_query(match_city)
 
 	for user in users:
 		for event in user.events:
-			graph.execute_query("MATCH (user:USER) " \
+			query = "MATCH (user:User) " \
 				 "MATCH (event:Event) " \
-				 "WHERE user.id = " + str(user.id) + " " \
+				 "WHERE user.id = \"" + str(user.id) + "\" " \
 				 "AND event.id = " + str(event.id)  + " " \
-				 "CREATE (user)-[:TAKES_PART_IN]->(event)")
+				 "CREATE UNIQUE (user)-[:TAKES_PART_IN]->(event)"
+			graph.execute_query(query)
 
 		for game in user.games:
-			graph.execute_query("MATCH (user:USER) " \
+			query = "MATCH (user:User) " \
 				 "MATCH (game:Game) " \
-				 "WHERE user.id = " + str(user.id) + " "\
-				 "AND game.title = \"" + str(game.title)  + "\" " + \
-				 "CREATE (user)-[:PLAYS]->(game)")
+				 "WHERE user.id = \"" + str(user.id) + "\" "\
+				 "AND game.title = \"" + str(game)  + "\" " + \
+				 "CREATE UNIQUE (user)-[:PLAYS]->(game)"
+			graph.execute_query(query)
 
 		for group in user.groups:
-			graph.execute_query("MATCH (user:USER) " \
+			query = "MATCH (user:User) " \
 				 "MATCH (group:Group) " \
-				 "WHERE user.id = " + str(user.id) + " "\
-				 "AND group.title = \"" + str(group.title)  + "\" " \
-				 "CREATE (user)-[:BELONGS_TO]->(group)")
+				 "WHERE user.id = \"" + str(user.id) + "\" "\
+				 "AND group.title = \"" + str(group)  + "\" " \
+				 "CREATE UNIQUE (user)-[:BELONGS_TO]->(group)"
+			graph.execute_query(query)
 
+		for friend in user.friends:
+			query = "MATCH (user:User) " \
+					"MATCH (friend:User) " \
+					"WHERE user.id = \"" + str(user.id) + "\" " \
+					"AND friend.id = \"" + str(friend.id) + "\" " \
+					"AND NOT (friend)-[:KNOWS]->(user) " \
+					"CREATE UNIQUE (user)-[:KNOWS]->(friend)"
+			graph.execute_query(query)
 
 
 def user_to_create_user_query(user):
 	return "CREATE(user:User " \
-		   "{name: \"" + user.name + "\", id: \"" + str(user.id) + "\"})"
+		   "{name: \"" + user.name + "\", id: \"" + str(user.id) + "\", city: \"" + \
+		   str(user.city) + "\"" + ", country: \"" + str(user.country) + "\"" + "})"
 
 def game_to_create_game_query(game):
 	return "CREATE(game:Game " \
@@ -225,10 +171,71 @@ def event_to_create_event_query(event):
 		   "\", id: " + str(event.id) + \
 		   ", city: \"" + event.city + "\"})"
 
+
+events_names = ['Cinema', 'Party', 'Paintball', 'Kayaking', 'Chess', 'Board games', 'LAN party', 'Carting']
+for i in range(10):
+	random.seed()
+	name = random.choice(names)
+	country = random.choice(countries)
+	city = random.choice(countriesCities[country])
+	name = random.choice(events_names)
+	events.append(Event(i, name, country, city))
+
+for i in range(100):
+	random.seed()
+	name = random.choice(names)
+	country = random.choice(countries)
+	city = random.choice(countriesCities[country])
+
+	defaultProbability = 30
+	largeProbability = 50
+	smallProbability = 10
+
+	gameProbability = 10
+	groupProbability = 15
+
+	userGames = []
+	for game in games:
+		if random.randint(0, 100) < gameProbability:
+			userGames.append(game)
+
+	userGroups = []
+	for group in groups:
+		if random.randint(0, 100) < groupProbability:
+			userGroups.append(group)
+
+	userEvents = []
+	for event in events:
+		if event.city == city and random.randint(0, 100) < largeProbability:
+			userEvents.append(event)
+		elif event.country == country and random.randint(0, 100) < defaultProbability:
+			userEvents.append(event)
+		elif random.randint(0, 100) < smallProbability:
+			userEvents.append(event)
+
+	users.append(User(i, name, country, city, userGames, userGroups, userEvents))
+
+friendLargeProbability = 3
+friendDefaultProbability = 2
+friendSmallProbability = 1
+
+for mainUser in users:
+	for friendUser in users:
+		if mainUser.id != friendUser.id:
+			if mainUser.city == friendUser.city and random.randint(0, 100) < friendLargeProbability:
+				mainUser.friends.append(friendUser)
+			elif mainUser.country == friendUser.country and random.randint(0, 100) < friendDefaultProbability:
+				mainUser.friends.append(friendUser)
+			elif random.randint(0, 100) < friendSmallProbability:
+				mainUser.friends.append(friendUser)
+
+
+# print users[4].friends[0].name
+
+
 graph = Graph()
 graph.wipe()
 
-print()
 add_users(users, graph)
 add_games(games, graph)
 add_groups(groups, graph)
@@ -238,5 +245,3 @@ add_events(events, graph)
 
 connect_events_with_places(events, graph)
 create_connections_of_users(users, graph)
-
-print()
